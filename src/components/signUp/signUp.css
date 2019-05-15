@@ -1,0 +1,12 @@
+.Button {
+    padding: 20px;
+  }
+  :local(.container) {
+    margin: 20px;
+    border:  pink;
+    padding:10px
+  }
+  :local(.content) {
+    font-size: 15px;
+    text-align: center;
+ }

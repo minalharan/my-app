@@ -1,0 +1,19 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "sever.js",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express-validator": "^5.3.1",
+    "jsonwebtoken": "^8.5.1",
+    "nodemailer": "^6.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

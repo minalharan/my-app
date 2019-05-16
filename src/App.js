@@ -44,8 +44,8 @@ class App extends Component {
       );
     };
     return (
-      <>
-        <Router>
+      <Router>
+        <>
           <Container fluid>
             <Switch>
               <DefaultLayout exact path="/" component={Home} />
@@ -66,8 +66,8 @@ class App extends Component {
               <DefaultLayout component={NoMatch} />
             </Switch>
           </Container>
-        </Router>
-      </>
+        </>
+      </Router>
     );
   }
 }

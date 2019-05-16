@@ -16,6 +16,8 @@ import Show from "./components/show/showProduct";
 import TableRow1 from "./components/signUp/TableRow1";
 import NoMatch from "./components/show/NoMatch";
 import ForgotPassword from "./components/signUp/ForgotPassword";
+import ResetPassword from "./components/signUp/ResetPassword";
+import Navbar1 from "./Navbar.js";
 
 class App extends Component {
   constructor(props) {
@@ -26,155 +28,46 @@ class App extends Component {
       // isLoggedIn: false
     };
   }
-  componentDidMount = async () => {
-    if (!token) {
-      this.props.history.push("/login");
-    }
-    console.log(this.props);
-    console.log("this.props");
-    const token = localStorage.getItem("token");
-    const { cId } = this.state;
-    const obj = { cId };
-    const res = await axios.post("http://192.168.2.112:8000/profile", obj, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (token.expiresIn === true) {
-      console.log("in iF");
-      this.props.history.push("/login");
-    }
-    console.log(res.data.result);
-    console.log("result");
-    const result1 = res.data.result;
-    console.log("result1");
-    console.log(result1);
-    this.setState({ profile: result1 });
-    console.log("profile");
-
-    if (!result1) {
-      console.log("error");
-    }
-  };
-
-  handleClose = e => {
-    this.setState({ show: false });
-  };
-
-  handleShow = e => {
-    this.setState({ show: true });
-  };
-  handleClick = e => {
-    this.setState({
-      show: !this.state.show
-    });
-  };
   render() {
-    const { profile } = this.state;
+    const DefaultLayout = ({ component: Component, ...rest }) => {
+      console.log("djfgfgudfyds");
+      return (
+        <Route
+          {...rest}
+          render={props => (
+            <>
+              <Navbar1 {...props} />
+              <Component {...props} />
+            </>
+          )}
+        />
+      );
+    };
     return (
-      <Router>
-        <>
-          <Navbar bg="dark" variant="dark">
-            <Navbar.Brand href="#home">Vendor</Navbar.Brand>
-            <Nav className="m-auto">
-              <NavLink
-                exact
-                to={"/"}
-                className="nav-item Box-model"
-                activeClassName="active"
-              >
-                <Button>
-                  <i class="fas fa-home top" />
-                  Home
-                </Button>
-              </NavLink>
-              {localStorage.getItem("token") ? (
-                <>
-                  <NavLink
-                    to={"/product-list"}
-                    className="nav-item Box-model"
-                    activeClassName="active"
-                  >
-                    <Button>
-                      {" "}
-                      <i class="fas fa-list top" />
-                      Product List
-                    </Button>
-                  </NavLink>
-
-                  <NavLink
-                    to={"/logout"}
-                    className="nav-item Box-model"
-                    activeClassName="active"
-                  >
-                    <Button>
-                      <i class="fas fa-sign-out-alt top" />Logout
-                    </Button>
-                  </NavLink>
-
-                  <Button onClick={this.handleShow}>
-                    <i class="fas fa-user top" />
-                    Profile
-                  </Button>
-                  <Modal show={this.state.show} onHide={this.handleClose}>
-                    <Modal.Header closeButton>
-                      <Modal.Title>Profile</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                      {" "}
-                      <div>{<TableRow1 obj={profile} key={profile._id} />}</div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                      <Button variant="secondary" onClick={this.handleClose}>
-                        Close
-                      </Button>
-                    </Modal.Footer>
-                  </Modal>
-                </>
-              ) : (
-                <>
-                  <NavLink
-                    to={"/signup"}
-                    className="nav-item Box-model"
-                    activeClassName="active"
-                  >
-                    <Button>
-                      {" "}
-                      <i class="fas fa-user-plus top" />
-                      Sign Up
-                    </Button>
-                  </NavLink>
-                  <NavLink
-                    to={"/login"}
-                    className="nav-item Box-model"
-                    activeClassName="active"
-                  >
-                    <Button>
-                      {" "}
-                      <i class="fas fa-sign-in-alt top" />
-                      Log In
-                    </Button>
-                  </NavLink>
-                </>
-              )}
-            </Nav>
-          </Navbar>
-
-          <Container>
+      <>
+        <Router>
+          <Container fluid>
             <Switch>
-              <Route exact path="/" component={Home} />
-              <Route path="/signup" component={SignUp} />
-              <Route path="/login" component={Login} />
-              <Route path="/add-product" component={AddProduct} />
-              <Route path="/product-list" component={ProductList} />
-              <Route path="/gtitem/:_id" component={Update} />
-              <Route path="/logout" component={Logout} />
-              <Route path="/getitem/:_id" component={Show} />
-              <Route path="/profile" component={TableRow1} />
-              <Route path="/forgot-password" component={ForgotPassword} />
-              <Route component={NoMatch} />
+              <DefaultLayout exact path="/" component={Home} />
+              <DefaultLayout path="/signup" component={SignUp} />
+              <DefaultLayout path="/login" component={Login} />
+              <DefaultLayout path="/add-product" component={AddProduct} />
+              <DefaultLayout path="/product-list" component={ProductList} />
+              <DefaultLayout path="/gtitem/:_id" component={Update} />
+              <DefaultLayout path="/logout" component={Logout} />
+              <DefaultLayout path="/getitem/:_id" component={Show} />
+              <DefaultLayout path="/profile" component={TableRow1} />
+              <DefaultLayout
+                path="/forgot-password"
+                component={ForgotPassword}
+              />
+              <DefaultLayout path="/reset/:token" component={ResetPassword} />
+              <DefaultLayout path="/navbar" component={Navbar1} />
+              <DefaultLayout component={NoMatch} />
             </Switch>
           </Container>
-        </>
-      </Router>
+        </Router>
+      </>
     );
   }
 }

@@ -10,13 +10,14 @@ const product = require("./model/product");
 const cors = require("cors");
 var bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const BCRYPT_SALT_ROUNDS = 12;
 app.use(cors());
 
 const { check, body, validationResult } = require("express-validator/check");
 const nodemailer = require("nodemailer");
 
 const multer = require("multer");
-
+// const op=server.op
 var jwt = require("jsonwebtoken");
 var upload = multer({
   dest: "uploads/"
@@ -549,23 +550,41 @@ app.put(
     }
   }
 );
-app.post("/forgotPassword", async (req, res) => {
-  if (req.body.email === "") {
-    res.status(400).send("email required");
-  }
-  console.error(req.body.email);
-  User.findOne({
-    email: req.body.email
-  }).then(email => {
-    if (!email) {
+app.post(
+  "/forgotPassword",
+  [
+    check("email")
+      .not()
+      .isEmpty()
+      .trim()
+      .normalizeEmail()
+  ],
+  async (req, res) => {
+    if (req.body.email === "") {
+      res.status(400).send("email required");
+    }
+    console.error(req.body.email);
+    const user = await User.findOne({
+      email: req.body.email
+    });
+    if (!user) {
       console.error("email not in database");
       res.status(403).send("email not in db");
     } else {
       const token = crypto.randomBytes(20).toString("hex");
-      email.update({
-        resetPasswordToken: token,
-        resetPasswordExpires: Date.now() + 360000
-      });
+      const user = await User.findOneAndUpdate(
+        { email: req.body.email },
+        {
+          $set: {
+            resetPasswordToken: token,
+            resetPasswordExpires: Date.now() + 600000
+          }
+        }
+      );
+      // res.status(200).json({
+      //   user,
+      //   message: "data get"
+      // });
 
       const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -577,12 +596,12 @@ app.post("/forgotPassword", async (req, res) => {
 
       const mailOptions = {
         from: "minal.chapter247@gmail.com",
-        to: `${email.email}`,
+        to: `${user.email}`,
         subject: "Link To Reset Password",
         text:
           "You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n" +
           "Please click on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\n" +
-          `http://localhost:3000/reset/${token}\n\n` +
+          `http://192.168.2.112:3000/reset/${token}\n\n` +
           "If you did not request this, please ignore this email and your password will remain unchanged.\n"
       };
 
@@ -597,8 +616,80 @@ app.post("/forgotPassword", async (req, res) => {
         }
       });
     }
+  }
+);
+
+// const Op = Sequelize.Op;
+app.get("/reset", async (req, res) => {
+  console.log(req.query);
+  console.log("Date.now()");
+  console.log(Date.now());
+
+  const user = await User.findOne({
+    resetPasswordToken: req.query.token,
+    resetPasswordExpires: {
+      $gt: Date.now()
+    }
   });
+
+  console.log("user");
+  console.log(user);
+  if (!user) {
+    console.error("password reset link is invalid or has expired");
+    res.status(403).send("password reset link is invalid or has expired");
+  } else {
+    res.status(200).send({
+      user,
+      message: "password reset link a-ok"
+    });
+  }
 });
+
+app.put("/updatePasswordViaEmail", async (req, res) => {
+  const user = User.findOne({
+    email: req.body.email,
+    resetPasswordToken: req.body.token,
+    resetPasswordExpires: {
+      $gt: Date.now()
+    }
+  });
+  if (!user) {
+    console.error("password reset link is invalid or has expired");
+    res.status(403).send("password reset link is invalid or has expired");
+  } else if (user != null) {
+    console.log("user exists in db");
+    const password = req.body.password;
+    const hashedPassword = bcrypt.hash(password, 10);
+
+    const user = await User.findOneAndUpdate(
+      {
+        email: req.body.email,
+        resetPasswordToken: req.body.token,
+        resetPasswordExpires: {
+          $gt: Date.now()
+        }
+      },
+      {
+        $set: {
+          password: hashedPassword,
+          resetPasswordToken: null,
+          resetPasswordExpires: null
+        }
+      }
+    );
+    console.log("password");
+    console.log(hashedPassword);
+
+    if (user) {
+      console.log("password updated");
+      res.status(200).send({ message: "password updated" });
+    }
+  } else {
+    console.error("no user exists in db to update");
+    res.status(401).json("no user exists in db to update");
+  }
+});
+
 var server = app.listen(8000, function() {
   var host = server.address().address;
   var port = server.address().port;

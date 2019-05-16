@@ -133,7 +133,7 @@ class ProductList extends Component {
               Product List
             </h2>
 
-            <Link to={"/add-product"}>
+            {/* <Link to={"/add-product"}>
               <MDBBtn
                 // rounded
                 // size="lg"
@@ -143,7 +143,7 @@ class ProductList extends Component {
                 <i class="far fa-plus-square top" />
                 Add Product
               </MDBBtn>
-            </Link>
+            </Link> */}
 
             <Table
               striped

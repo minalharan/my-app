@@ -189,7 +189,7 @@ class AddProduct extends Component {
           <h3 align="center">Add Product</h3>
           <form onSubmit={this.onSubmit} noValidate>
             <FormGroup className="animate">
-              <FormLabel>
+              <FormLabel><i class="fab fa-product-hunt top"></i>
                 Title <span className="required">*</span>
               </FormLabel>
               <FormControl
@@ -206,6 +206,7 @@ class AddProduct extends Component {
             </FormGroup>
             <FormGroup className="animate">
               <FormLabel>
+                <i class="fas fa-info top" />
                 Details <span className="required">*</span>
               </FormLabel>
               <FormControl
@@ -221,7 +222,8 @@ class AddProduct extends Component {
               ) : null}
             </FormGroup>
             <FormGroup className="animate">
-              <FormLabel><i class="fas fa-dollar-sign top"></i>
+              <FormLabel>
+                <i class="fas fa-tag top" />
                 Price <span className="required">*</span>
               </FormLabel>
               <FormControl
@@ -239,7 +241,8 @@ class AddProduct extends Component {
             </FormGroup>
 
             <FormGroup className="animate">
-              <FormLabel><i class="fas fa-dollar-sign top"></i>
+              <FormLabel>
+                <i class="fas fa-tag top" />
                 Selling Price <span className="required">*</span>
               </FormLabel>
               <FormControl
@@ -257,7 +260,7 @@ class AddProduct extends Component {
 
             <FormGroup className="animate">
               <FormLabel>
-              <i class="far fa-file-image top" />
+                <i class="far fa-file-image top" />
                 Image <span className="required">*</span>
               </FormLabel>
               <FormControl

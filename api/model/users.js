@@ -8,7 +8,9 @@ const value = {
   password: String,
   category: String,
   idProof: String,
-  file: String
+  file: String,
+  resetPasswordToken:String,
+  resetPasswordExpires:Date,
 };
 
 const UserModel = mongoose.model("User", value);

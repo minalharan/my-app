@@ -54,11 +54,6 @@ class Navbar1 extends Component {
       console.log("error");
     }
   };
-  static getDerivedStateFromProps = (props, state) => {
-    console.log(props);
-    console.log(localStorage);
-    console.log("componentDidUpdate");
-  };
   handleClose = e => {
     this.setState({ show: false });
   };
@@ -78,74 +73,72 @@ class Navbar1 extends Component {
     console.log(isLoggedIn);
     console.log("isLoggedIn************************");
     return (
-      <Router>
-        <>
-          <Navbar bg="dark" variant="dark">
-            <Navbar.Brand href="#home">Vendor</Navbar.Brand>
-            <Nav className="m-auto">
-              <NavLink
-                to={"/"}
-                className="nav-item Box-model"
-                activeClassName="active"
-              >
-                <Button>Home</Button>
-              </NavLink>
-              {isLoggedIn ? (
-                <>
-                  <NavLink
-                    to={"/product-list"}
-                    className="nav-item Box-model"
-                    activeClassName="active"
-                  >
-                    <Button>Product List</Button>
-                  </NavLink>
+      <>
+        <Navbar bg="dark" variant="dark">
+          <Navbar.Brand href="#home">Vendor</Navbar.Brand>
+          <Nav className="m-auto">
+            <NavLink
+              to={"/"}
+              className="nav-item Box-model"
+              activeClassName="active"
+            >
+              <Button>Home</Button>
+            </NavLink>
+            {localStorage.getItem("token") ? (
+              <>
+                <NavLink
+                  to={"/product-list"}
+                  className="nav-item Box-model"
+                  activeClassName="active"
+                >
+                  <Button>Product List</Button>
+                </NavLink>
 
-                  <NavLink
-                    to={"/logout"}
-                    className="nav-item Box-model"
-                    activeClassName="active"
-                  >
-                    <Button>Logout</Button>
-                  </NavLink>
+                <NavLink
+                  to={"/logout"}
+                  className="nav-item Box-model"
+                  activeClassName="active"
+                >
+                  <Button>Logout</Button>
+                </NavLink>
 
-                  <Button onClick={this.handleShow}>Profile</Button>
-                  <Modal show={this.state.show} onHide={this.handleClose}>
-                    <Modal.Header closeButton>
-                      <Modal.Title>Profile</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                      {" "}
-                      <div>{<TableRow1 obj={profile} key={profile._id} />}</div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                      <Button variant="secondary" onClick={this.handleClose}>
-                        Close
-                      </Button>
-                    </Modal.Footer>
-                  </Modal>
-                </>
-              ) : (
-                <>
-                  <NavLink
-                    to={"/signup"}
-                    className="nav-item Box-model"
-                    activeClassName="active"
-                  >
-                    <Button>Sign Up</Button>
-                  </NavLink>
-                  <NavLink
-                    to={"/login"}
-                    className="nav-item Box-model"
-                    activeClassName="active"
-                  >
-                    <Button>Log In</Button>
-                  </NavLink>
-                </>
-              )}
-            </Nav>
-          </Navbar>
-        </>
-      </Router>
+                <Button onClick={this.handleShow}>Profile</Button>
+                <Modal show={this.state.show} onHide={this.handleClose}>
+                  <Modal.Header closeButton>
+                    <Modal.Title>Profile</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                    {" "}
+                    <div>{<TableRow1 obj={profile} key={profile._id} />}</div>
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button variant="secondary" onClick={this.handleClose}>
+                      Close
+                    </Button>
+                  </Modal.Footer>
+                </Modal>
+              </>
+            ) : (
+              <>
+                <NavLink
+                  to={"/signup"}
+                  className="nav-item Box-model"
+                  activeClassName="active"
+                >
+                  <Button>Sign Up</Button>
+                </NavLink>
+                <NavLink
+                  to={"/login"}
+                  className="nav-item Box-model"
+                  activeClassName="active"
+                >
+                  <Button>Log In</Button>
+                </NavLink>
+              </>
+            )}
+          </Nav>
+        </Navbar>
+      </>
     );
   }
 }

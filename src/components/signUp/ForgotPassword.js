@@ -1,23 +1,24 @@
 import React, { Component } from "react";
 import TextField from "@material-ui/core/TextField";
 import axios from "axios";
+import { MDBBtn } from "mdbreact";
+import HeaderBar from "./HeaderBar.js";
+import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 import {
-  LinkButtons,
-  SubmitButtons,
-  registerButton,
-  homeButton,
-  forgotButton,
-  inputStyle,
-  HeaderBar
-} from "../components";
-
+  Table,
+  Button,
+  FormLabel,
+  FormGroup,
+  FormControl
+} from "react-bootstrap";
 const title = {
   pageTitle: "Forgot Password Screen"
 };
 
 class ForgotPassword extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       email: "",
@@ -26,7 +27,12 @@ class ForgotPassword extends Component {
       showNullError: false
     };
   }
-
+  componentDidMount() {
+    const token = localStorage.getItem("token");
+    if (token) {
+      this.props.history.push("/product-list");
+    }
+  }
   handleChange = name => event => {
     this.setState({
       [name]: event.target.value
@@ -44,7 +50,7 @@ class ForgotPassword extends Component {
       });
     } else {
       axios
-        .post("http://localhost:3003/forgotPassword", {
+        .post("http://192.168.2.112:8000/forgotPassword", {
           email
         })
         .then(response => {
@@ -75,45 +81,41 @@ class ForgotPassword extends Component {
 
     return (
       <div>
-        <HeaderBar title={title} />
-        <form className="profile-form" onSubmit={this.sendEmail}>
-          <TextField
-            style={inputStyle}
-            id="email"
-            label="email"
-            value={email}
-            onChange={this.handleChange("email")}
-            placeholder="Email Address"
-          />
-          <SubmitButtons
-            buttonStyle={forgotButton}
-            buttonText="Send Password Reset Email"
-          />
-        </form>
-        {showNullError && (
-          <div>
-            <p>The email address cannot be null.</p>
-          </div>
-        )}
-        {showError && (
-          <div>
-            <p>
-              That email address isn&apos;t recognized. Please try again or
-              register for a new account.
-            </p>
-            <LinkButtons
-              buttonText="Register"
-              buttonStyle={registerButton}
-              link="/register"
+        <link
+          rel="stylesheet"
+          href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay"
+          crossorigin="anonymous"
+        />
+        <form className="animate auth-box1" onSubmit={this.sendEmail}>
+          <FormGroup>
+            {" "}
+            <FormLabel>
+              <i class="fa fa-envelope top" />
+              Email <span className="required">*</span>
+            </FormLabel>
+            <FormControl
+              type="email"
+              name="email"
+              placeholder="Enter email"
+              value={email}
+              onChange={this.handleChange("email")}
             />
-          </div>
-        )}
+          </FormGroup>
+          <Button type="submit"> Submit</Button>
+          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+          &nbsp; &nbsp;
+          <Link to={"/"}>
+            <Button varient="info">Home</Button>
+          </Link>
+        </form>
+        {showNullError && toast("The email address cannot be null.")}
+        {showError && toast.error("That email address is not recognized.")}
         {messageFromServer === "recovery email sent" && (
           <div>
             <h3>Password Reset Email Successfully Sent!</h3>
           </div>
         )}
-        <LinkButtons buttonText="Go Home" buttonStyle={homeButton} link="/" />
       </div>
     );
   }

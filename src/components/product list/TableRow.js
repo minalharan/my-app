@@ -2,10 +2,10 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { MDBBtn, MDBicon } from "mdbreact";
+import { MDBBtn } from "mdbreact";
 import TableRow3 from "../show/products";
 import Swal from "sweetalert2";
-import { Button, Row, Container, Modal } from "react-bootstrap";
+import { Button, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
 
 const BASE_URL = "http://192.168.2.112:8000/";
 class TableRow extends Component {
@@ -72,10 +72,6 @@ class TableRow extends Component {
     return (
       <tr>
         <td>{}</td>
-        <td className="c">{this.props.obj.productTitle}</td>
-        <td className="c">{this.props.obj.productDetail}</td>
-        <td>$ {this.props.obj.productPrice.toFixed(2)}</td>
-        <td>$ {this.props.obj.productSellingPrice.toFixed(2)}</td>
         <td>
           <img
             src={BASE_URL + this.props.obj.file}
@@ -100,77 +96,92 @@ class TableRow extends Component {
             </dialog>
           )}
         </td>
-        <td>
-          <Link to={"/gtitem/" + this.props.obj._id}>
-            <MDBBtn rounded size="lg" color="warning">
-              <i class="fas fa-pencil-alt top" />
-              Edit
-            </MDBBtn>
-          </Link>
-        </td>
-        <td>
-          <MDBBtn
-            rounded
-            size="lg"
-            color="danger"
-            onClick={e =>
-              Swal.fire({
-                title: "Are you sure?",
-                text: "You won't be able to revert this!",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, delete it!"
-              }).then(result => {
-                if (result.value) {
-                  Swal.fire(
-                    "Deleted!",
-                    "Your file has been deleted.",
-                    "success"
-                  ) && this.props.onDelete(this.props.obj._id);
-                }
-              })
-            }
-            // onClick={e =>
-            //   window.confirm("Are you sure you want to delete this item?") &&
-            //   this.onSubmit(e)
-            // }
-          >
-            <i class="fas fa-trash top" />
-            Delete
-          </MDBBtn>
-        </td>
+        <td className="c">{this.props.obj.productTitle}</td>
+        <td className="c">{this.props.obj.productDetail}</td>
+        <td>${this.props.obj.productPrice.toFixed(2)}</td>
+        <td>${this.props.obj.productSellingPrice.toFixed(2)}</td>
 
         <td>
-          <>
-            <Container>
-              <Row>
-                <MDBBtn
-                  rounded
-                  size="lg"
-                  color="info"
-                  onClick={this.handleShow}
-                >
-                  <i class="fas fa-eye top" />
-                  View
-                </MDBBtn>
-                <Modal show={this.state.show} onHide={this.handleClose}>
-                  <Modal.Header closeButton>
-                    <Modal.Title>View</Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body>
-                    <div>{<TableRow3 obj={value} key={value._id} />}</div>
-                  </Modal.Body>
-                  <Modal.Footer>
-                    <Button variant="secondary" onClick={this.handleClose}>
-                      Close
-                    </Button>
-                  </Modal.Footer>
-                </Modal>
-              </Row>
-            </Container>
-          </>
+          <Link to={"/gtitem/" + this.props.obj._id}>
+            <OverlayTrigger
+              key="top"
+              placement="bottom"
+              overlay={<Tooltip id="tooltip-top">Edit</Tooltip>}
+            >
+              <MDBBtn rounded size="lg" color="outline-warning">
+                <i class="fas fa-pencil-alt top" />
+              </MDBBtn>
+            </OverlayTrigger>
+          </Link>{" "}
+          &nbsp; &nbsp;
+          <OverlayTrigger
+            key="top"
+            placement="left"
+            overlay={<Tooltip id="tooltip-top">Delete</Tooltip>}
+          >
+            <MDBBtn
+              rounded
+              size="lg"
+              color="outline-danger"
+              onClick={e =>
+                Swal.fire({
+                  title: "Are you sure?",
+                  text: "You won't be able to revert this!",
+                  type: "warning",
+                  showCancelButton: true,
+                  confirmButtonColor: "#3085d6",
+                  cancelButtonColor: "#d33",
+                  confirmButtonText: "Yes, delete it!"
+                }).then(result => {
+                  if (result.value) {
+                    Swal.fire(
+                      "Deleted!",
+                      "Your file has been deleted.",
+                      "success"
+                    ) && this.props.onDelete(this.props.obj._id);
+                  }
+                })
+              }
+              // onClick={e =>
+              //   window.confirm("Are you sure you want to delete this item?") &&
+              //   this.onSubmit(e)
+              // }
+            >
+              <i class="fas fa-trash top" />
+            </MDBBtn>
+          </OverlayTrigger>
+          &nbsp; &nbsp;
+          <OverlayTrigger
+            key="top"
+            placement="top"
+            overlay={<Tooltip id="tooltip-top">View</Tooltip>}
+          >
+            <MDBBtn
+              rounded
+              size="lg"
+              color="outline-info"
+              onClick={this.handleShow}
+            >
+              <i class="fas fa-eye top" />
+            </MDBBtn>
+          </OverlayTrigger>
+          <Modal
+            show={this.state.show}
+            onHide={this.handleClose}
+            className="animate"
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>View</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <div>{<TableRow3 obj={value} key={value._id} />}</div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={this.handleClose}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </td>
       </tr>
     );

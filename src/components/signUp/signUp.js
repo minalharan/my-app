@@ -11,6 +11,8 @@ import {
   Container
 } from "react-bootstrap";
 import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
+const BASE_URL = "http://192.168.2.112:8000/";
 
 class SignUp extends Component {
   constructor(props) {
@@ -27,7 +29,9 @@ class SignUp extends Component {
       idProof: "",
       file: "",
       errors: {},
-      categoryValue: []
+      categoryValue: [],
+      imageUpdated: false,
+      imagePreviewUrl: ""
     };
   }
   componentDidMount() {
@@ -217,14 +221,31 @@ class SignUp extends Component {
     });
   };
   onChangefile = e => {
-    console.log(e.target.files[0]);
-    console.log("e.target.files[0]");
+    let reader = new FileReader();
+    let file = e.target.files[0];
     this.setState({
-      file: e.target.files[0] ? e.target.files[0] : null
+      file: e.target.files[0] ? e.target.files[0] : null,
+      imageUpdated: true
     });
-  };
+    reader.onloadend = () => {
+      this.setState({
+        file: file,
+        imagePreviewUrl: reader.result
+      });
+    };
 
+    reader.readAsDataURL(file);
+  };
   render() {
+    let { imagePreviewUrl, file } = this.state;
+    let $imagePreview = (
+      <img src={BASE_URL + this.state.file} width="150px" height="150px" />
+    );
+    if (imagePreviewUrl) {
+      $imagePreview = (
+        <img src={imagePreviewUrl} width="150px" height="150px" />
+      );
+    }
     const { categoryValue, errors } = this.state;
     console.log(errors);
     const {
@@ -247,7 +268,7 @@ class SignUp extends Component {
         />
 
         <h2 align="center">Sign Up </h2>
-        <Row className="auth-box1">
+        <Row className="auth-box1 animate">
           <Container>
             <form onSubmit={this.onSubmit} noValidate>
               <FormGroup>
@@ -396,26 +417,30 @@ class SignUp extends Component {
                 />
                 {fileError ? <p className="text-danger">{fileError}</p> : null}
               </FormGroup>
+              <FormGroup align="center">
+                <div className="imgPreview">{$imagePreview}</div>
+              </FormGroup>
+
               <Button
                 variant="primary"
                 type="submit"
-                style={{ width: "200px", padding: "5px" }}
+                style={{ width: "150px", padding: "5px" }}
               >
                 {" "}
                 <i class="fas fa-user-plus top" />
                 Sign Up
               </Button>
-              &nbsp; &nbsp;
-              <Button
-                variant="info"
+              <br />
+              <br />
+              <Link
+                variant="primary"
                 onClick={() => {
                   this.props.history.push("/login");
                 }}
-                style={{ width: "200px", padding: "5px" }}
+                style={{ width: "150px", padding: "5px" }}
               >
-                <i class="fas fa-sign-in-alt top" />
-                Log In
-              </Button>
+                Already have an account ?
+              </Link>
             </form>
           </Container>
         </Row>

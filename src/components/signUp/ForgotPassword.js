@@ -1,20 +1,18 @@
 import React, { Component } from "react";
-import TextField from "@material-ui/core/TextField";
 import axios from "axios";
-import { MDBBtn } from "mdbreact";
-import HeaderBar from "./HeaderBar.js";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { Link } from "react-router-dom";
+import Validator, { ValidationTypes } from "js-object-validation";
+import Swal from "sweetalert2";
+
 import {
-  Table,
   Button,
   FormLabel,
   FormGroup,
-  FormControl
+  FormControl,
+  Row,
+  Col
 } from "react-bootstrap";
-const title = {
-  pageTitle: "Forgot Password Screen"
-};
 
 class ForgotPassword extends Component {
   constructor(props) {
@@ -24,61 +22,86 @@ class ForgotPassword extends Component {
       email: "",
       showError: false,
       messageFromServer: "",
-      showNullError: false
+      showNullError: false,
+      isLoading: false,
+      errors: {}
     };
   }
-  componentDidMount() {
-    const token = localStorage.getItem("token");
-    if (token) {
-      this.props.history.push("/product-list");
-    }
-  }
+  // componentDidMount() {
+  //   const token = localStorage.getItem("token");
+  //   if (token) {
+  //     this.props.history.push("/product-list");
+  //   }
+  // }
   handleChange = name => event => {
     this.setState({
-      [name]: event.target.value
+      [name]: event.target.value,
+      errors: {
+        ...this.state.errors,
+        [name]: null
+      }
     });
   };
 
-  sendEmail = e => {
+  sendEmail = async e => {
     e.preventDefault();
-    const { email } = this.state;
-    if (email === "") {
-      this.setState({
-        showError: false,
-        messageFromServer: "",
-        showNullError: true
-      });
-    } else {
-      axios
-        .post("http://192.168.2.112:8000/forgotPassword", {
-          email
-        })
-        .then(response => {
-          console.log(response.data);
-          if (response.data === "recovery email sent") {
-            this.setState({
-              showError: false,
-              messageFromServer: "recovery email sent",
-              showNullError: false
-            });
-          }
-        })
-        .catch(error => {
-          console.error(error.response.data);
-          if (error.response.data === "email not in db") {
-            this.setState({
-              showError: true,
-              messageFromServer: "",
-              showNullError: false
-            });
-          }
+    this.setState({
+      isLoading: true
+    });
+    try {
+      const { email } = this.state;
+      const obj = { email };
+      const validations = {
+        email: {
+          [ValidationTypes.REQUIRED]: true,
+          [ValidationTypes.EMAIL]: true
+        }
+      };
+      const messages = {
+        email: {
+          [ValidationTypes.REQUIRED]: "Please enter email.",
+          [ValidationTypes.EMAIL]: "Please enter valid email."
+        }
+      };
+      const { isValid, errors } = Validator(obj, validations, messages);
+      if (!isValid) {
+        this.setState({
+          errors,
+          isLoading: false
         });
+        return;
+      }
+
+      const response = await axios.post(
+        "http://192.168.2.112:8000/forgotPassword",
+        obj
+      );
+      if (response) {
+        toast.info("Forget link sent on your email");
+        this.setState({ email: "", isLoading: false });
+
+        this.props.history.push("/login");
+      }
+    } catch (error) {
+      console.log(error.response.data);
+      this.setState({ isLoading: false });
+      Swal.fire({
+        type: "error",
+        title: "Oops...",
+        text: "Something went wrong!"
+      });
+      toast.error(
+        `${(error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+          "Unknown error"}`
+      );
     }
   };
 
   render() {
-    const { email, messageFromServer, showNullError, showError } = this.state;
-
+    const { email, isLoading, errors } = this.state;
+    const { email: emailError } = errors;
     return (
       <div>
         <link
@@ -87,35 +110,40 @@ class ForgotPassword extends Component {
           integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay"
           crossorigin="anonymous"
         />
-        <form className="animate auth-box1" onSubmit={this.sendEmail}>
-          <FormGroup>
-            {" "}
-            <FormLabel>
-              <i class="fa fa-envelope top" />
-              Email <span className="required">*</span>
-            </FormLabel>
-            <FormControl
-              type="email"
-              name="email"
-              placeholder="Enter email"
-              value={email}
-              onChange={this.handleChange("email")}
-            />
-          </FormGroup>
-          <Button type="submit"> Submit</Button>
-          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-          &nbsp; &nbsp;
-          <Link to={"/"}>
-            <Button varient="info">Home</Button>
-          </Link>
-        </form>
-        {showNullError && toast("The email address cannot be null.")}
-        {showError && toast.error("That email address is not recognized.")}
-        {messageFromServer === "recovery email sent" && (
-          <div>
-            <h3>Password Reset Email Successfully Sent!</h3>
-          </div>
-        )}
+        <Row className="animate">
+          <Col sm={6} md={4} lg={4} xs={12} />
+          <Col sm={6} md={4} lg={4} xs={12} className="auth-box1">
+            <h2 align="center">Forgot Password</h2>
+            <br />
+            <form onSubmit={this.sendEmail} noValidate>
+              <ToastContainer />
+              <FormGroup>
+                <i class="fa fa-envelope top" />
+                &nbsp;
+                <FormLabel>Enter Email </FormLabel>
+                <FormControl
+                  type="email"
+                  name="email"
+                  placeholder="Enter email"
+                  value={email}
+                  onChange={this.handleChange("email")}
+                />
+                {emailError ? (
+                  <p className=" text-danger">{emailError}</p>
+                ) : null}
+              </FormGroup>
+              <Button type="submit" variant="outline-success">
+                {" "}
+                {isLoading ? "please wait.." : "Submit"}
+              </Button>
+              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+              &nbsp; &nbsp; &nbsp;
+              <Link to={"/"}>
+                <Button variant="outline-primary">Home</Button>
+              </Link>
+            </form>
+          </Col>
+        </Row>
       </div>
     );
   }

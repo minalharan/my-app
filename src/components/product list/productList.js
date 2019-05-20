@@ -1,12 +1,11 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Table, Button } from "react-bootstrap";
+import { Table, Button, OverlayTrigger, Tooltip, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
 import TableRow from "./TableRow";
 import { Link } from "react-router-dom";
 import { MDBBtn, MDBIcon } from "mdbreact";
 import "./productlist.css";
-import Favicon from "react-favicon";
 
 class ProductList extends Component {
   constructor(props) {
@@ -56,7 +55,7 @@ class ProductList extends Component {
       "http://192.168.2.112:8000/deleteitem/" + productId
     );
     if (result) {
-      toast("product Deleted");
+      console.log("product Deleted");
     }
     this.getData();
   };
@@ -72,59 +71,74 @@ class ProductList extends Component {
         />
         {product.length ? (
           <>
-            <h2 align="center" className="M">
-              {" "}
-              Product List
-            </h2>
+            <Row style={{ margin: "0 auto" }}>
+              <h2 align="left" className="M">
+                {" "}
+                Product List
+              </h2>
 
-            <div>
-              {" "}
-              <Link to={"/add-product"}>
-                <MDBBtn
-                  rounded
-                  size="lg"
-                  color="info"
-                  style={{ float: "right", bottom: "30px" }}
-                >
-                  <i class="fas fa-plus top" />
-                  Add Product
-                </MDBBtn>
-              </Link>
-            </div>
-            <Table
-              striped
-              bordered
-              hover
-              variant="dark"
-              className="table animate css-serial"
-            >
-              <thead>
-                <tr>
-                  <th>S.No.</th>
-                  <th className="mg">Title</th>
-                  <th className="mg1">Details</th>
-                  <th className="mg1">Price</th>
-                  <th className="mg1">Product Selling Price</th>
-                  <th className="mg1">Product Image</th>
-                  <th className="mg2" text-align="center" colSpan="3">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {product && product.length
-                  ? product.map(product => {
-                      return (
-                        <TableRow
-                          obj={product}
-                          key={product._id}
-                          onDelete={this.onDelete}
-                        />
-                      );
-                    })
-                  : null}
-              </tbody>
-            </Table>
+              <div>
+                {" "}
+                <Link to={"/add-product"}>
+                  <OverlayTrigger
+                    key="top"
+                    placement="top"
+                    overlay={
+                      <Tooltip id="tooltip-top">Add new product.</Tooltip>
+                    }
+                  >
+                    <MDBBtn
+                      rounded
+                      size="lg"
+                      color="info"
+                      style={{
+                        float: "right",
+                        top: "10px",
+                        // bottom: "20px",
+                        padding: "4px",
+                        left: "900px"
+                      }}
+                    >
+                      <i class="fas fa-plus top" />
+                      Add Product
+                    </MDBBtn>
+                  </OverlayTrigger>
+                </Link>
+              </div>
+              <Table
+                striped
+                bordered
+                hover
+                variant="dark"
+                className="table animate css-serial"
+              >
+                <thead>
+                  <tr>
+                    <th>S.No.</th>
+                    <th>Image</th>
+                    <th text-align="center">Title</th>
+                    <th text-align="center">Details</th>
+                    <th>Price</th>
+                    <th>Selling Price</th>
+
+                    <th colSpan="3">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {product && product.length
+                    ? product.map(product => {
+                        return (
+                          <TableRow
+                            obj={product}
+                            key={product._id}
+                            onDelete={this.onDelete}
+                          />
+                        );
+                      })
+                    : null}
+                </tbody>
+              </Table>
+            </Row>
           </>
         ) : (
           <>
@@ -132,18 +146,6 @@ class ProductList extends Component {
               {" "}
               Product List
             </h2>
-
-            {/* <Link to={"/add-product"}>
-              <MDBBtn
-                // rounded
-                // size="lg"
-                color="info"
-                // style={{ float: "right", bottom: "30px" }}
-              >
-                <i class="far fa-plus-square top" />
-                Add Product
-              </MDBBtn>
-            </Link> */}
 
             <Table
               striped
@@ -154,25 +156,17 @@ class ProductList extends Component {
             >
               <thead>
                 <tr>
-                  <th width="30px" text-align="center">
-                    S.No.
-                  </th>
-                  <th width="130px" text-align="center">
-                    Title
-                  </th>
-                  <th width="130px" text-align="center">
-                    Details
-                  </th>
-                  <th width="130px" text-align="center">
-                    Price
-                  </th>
-                  <th width="130px" text-align="center">
-                    Product Selling Price
-                  </th>
-                  <th width="130px" text-align="center">
-                    Product Image
-                  </th>
-                  <th width="230px" text-align="center" colSpan="3">
+                  <th text-align="center">S.No.</th>
+                  <th text-align="center">Image</th>
+                  <th text-align="center">Title</th>
+                  <th text-align="center">Details</th>
+                  <th text-align="center">Price</th>
+                  <th text-align="center">Selling Price</th>
+
+                  <th
+                    // text-align="center"
+                    colSpan="3"
+                  >
                     Action
                   </th>
                 </tr>
@@ -191,26 +185,34 @@ class ProductList extends Component {
                   : null}
               </tbody>
             </Table>
-            {/* <Favicon url="http://oflisback.github.io/react-favicon/public/img/github.ico" /> */}
-            <MDBIcon icon="ban" className="icons bans" />
-            <div>{/* <i class="fas fa-ban"></i> */}</div>
-            <h5 text align="center" padding-left="40px">
-              Currently there are no Product details added.
-            </h5>
-            <p text align="center" padding-left="40px">
-              {" "}
-              Please click below button to add new.!
-            </p>
-            <Link to={"/add-product"}>
-              {" "}
-              <div>
-                <Button className="flax-center">
-                  {" "}
-                  <i class="fas fa-plus top" />
-                  Add New
-                </Button>
-              </div>
-            </Link>
+            <div style={{ margin: "0 auto" }}>
+              <MDBIcon icon="ban" className="icons bans" align="center" />
+              <h5 text align="center" padding-left="40px">
+                Currently there are no Product details added.
+              </h5>
+              <p text align="center" padding-left="40px">
+                {" "}
+                Please click below button to add new.!
+              </p>
+              <Link to={"/add-product"}>
+                {" "}
+                <div>
+                  <OverlayTrigger
+                    key="top"
+                    placement="bottom"
+                    overlay={
+                      <Tooltip id="tooltip-top">Add new product.</Tooltip>
+                    }
+                  >
+                    <Button className="flax-center">
+                      {" "}
+                      <i class="fas fa-plus top" />
+                      Add New
+                    </Button>
+                  </OverlayTrigger>
+                </div>
+              </Link>
+            </div>
           </>
         )}
       </>

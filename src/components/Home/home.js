@@ -10,7 +10,7 @@ class Home extends Component {
           integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay"
           crossorigin="anonymous"
         />
-        <div className="animate">
+        <div>
           <h1>Welcome</h1>
           {/* <img src={image} width="100" height="50" /> */}
         </div>

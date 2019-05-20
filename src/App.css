@@ -42,16 +42,16 @@
   margin: 50px 0;
   border-radius: 5px;
   padding-left: 40px;
-margin-left: 400px;
-margin-right: 400px;
-padding-right: 40px;
+  margin-left: 400px;
+  margin-right: 400px;
+  padding-right: 40px;
 }
 
 .bg {
   background-color: #d1caca;
 }
 .Box-model {
-  padding-right: 12px;
+  padding-right: 20px;
   height: 32px;
 }
 .container {
@@ -64,11 +64,7 @@ padding-right: 40px;
 .c {
   text-transform: capitalize;
 }
-.active {
-  background: #111;
-  font-weight: 200;
-  /* text-transform: uppercase; */
-}
+
 .animate {
   -webkit-animation: animatezoom 0.6s;
   animation: animatezoom 0.6s;
@@ -115,12 +111,14 @@ padding-right: 40px;
 }
 .mg {
   padding-right: 30px;
+  padding-left: 15px;
 }
 .mg1 {
   padding-left: 100px;
 }
 .mg2 {
-  padding-left: 122px;
+  /* padding-left: 122px; */
+  padding-left: 250px;
 }
 .mg3 {
   /* margin-left: "265px"; */
@@ -140,12 +138,11 @@ padding-right: 40px;
   font-size: 38px;
   font-weight: 600;
   color: #989898;
-  padding-left: 440px;
+  padding-left: 600px;
   padding-bottom: 12px;
   padding-top: 12px;
 }
 .bans {
-
   font-style: normal;
   font-weight: 400;
   -webkit-font-feature-settings: normal;
@@ -167,5 +164,13 @@ padding-right: 40px;
 }
 .top {
   padding-top: 5px;
-  padding-right: 5px;
+  padding-right: 3px;
+}
+.active {
+  background: rgb(185, 37, 37);
+  font-weight: 200px;
+  background-color: none;
+  background: none;
+  font-weight: bold;
+  border-bottom: 2px solid rgb(41, 5, 245);
 }

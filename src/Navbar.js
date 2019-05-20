@@ -1,20 +1,10 @@
 import React, { Component } from "react";
-import SignUp from "./components/signUp/signUp";
-import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
-import Home from "./components/Home/home";
 import "./App.css";
-import Login from "./components/login/login";
-import AddProduct from "./components/addProduct/addProduct";
-import { Navbar, Container, Nav, Button, Modal } from "react-bootstrap";
+import { Navbar, Nav, Button, Modal } from "react-bootstrap";
 import axios from "axios";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
-import ProductList from "./components/product list/productList";
-import Update from "./components/product list/update";
-import Logout from "./components/logout/logout";
-import Show from "./components/show/showProduct";
 import TableRow1 from "./components/signUp/TableRow1";
-import NoMatch from "./components/show/NoMatch";
 import "./App.js";
 
 class Navbar1 extends Component {
@@ -23,7 +13,11 @@ class Navbar1 extends Component {
     this.state = {
       profile: "",
       cId: localStorage.getItem("cId"),
-      isLoggedIn: false
+      isLoggedIn: false,
+      Value: "",
+      disabled: true,
+      hide: "",
+      enable: false
     };
   }
   componentDidMount = async () => {
@@ -31,12 +25,6 @@ class Navbar1 extends Component {
     console.log("this.props");
 
     const token = localStorage.getItem("token");
-    this.setState({
-      isLoggedIn: token ? true : false
-    });
-    // if (!token) {
-    //   this.props.history.push("/login");
-    // }
     const { cId } = this.state;
     const obj = { cId };
     const res = await axios.post("http://192.168.2.112:8000/profile", obj, {
@@ -47,92 +35,126 @@ class Navbar1 extends Component {
     const result1 = res.data.result;
     console.log("result1");
     console.log(result1);
-    this.setState({ profile: result1 });
-    console.log("profile");
+    this.setState({ profile: result1, Value: res.data.success });
+    console.log("res.data.success");
+    console.log(res.data.success);
 
     if (!result1) {
       console.log("error");
     }
   };
   handleClose = e => {
-    this.setState({ show: false });
+    this.setState({ show: false, disabled: !this.state.disabled });
   };
 
   handleShow = e => {
-    this.setState({ show: true });
+    this.setState({ show: true, disabled: true });
   };
   handleClick = e => {
     this.setState({
       show: !this.state.show
     });
   };
+  isEnable = e => {
+    this.setState({
+      disabled: !this.state.disabled,
+      enable: true
+    });
+  };
   render() {
-    const { profile, isLoggedIn } = this.state;
-    console.log(localStorage);
-    console.log("localStorage************************");
-    console.log(isLoggedIn);
-    console.log("isLoggedIn************************");
+    const { profile } = this.state;
+    console.log(this.state.Value);
     return (
       <>
+        <link
+          rel="stylesheet"
+          href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay"
+          crossorigin="anonymous"
+        />
+
         <Navbar bg="dark" variant="dark">
           <Navbar.Brand href="#home">Vendor</Navbar.Brand>
-          <Nav className="m-auto">
+          <Nav className="ml-auto">
             <NavLink
+              exact
               to={"/"}
               className="nav-item Box-model"
-              activeClassName="active"
+              activeClassName={"active"}
             >
-              <Button>Home</Button>
+              <i class="fa fa-home top" aria-hidden="true" />
+              Home
             </NavLink>
             {localStorage.getItem("token") ? (
               <>
                 <NavLink
                   to={"/product-list"}
                   className="nav-item Box-model"
-                  activeClassName="active"
+                  activeClassName={"active"}
                 >
-                  <Button>Product List</Button>
+                  <i class="fa fa-list top" aria-hidden="true" />
+                  Product List
                 </NavLink>
 
                 <NavLink
                   to={"/logout"}
                   className="nav-item Box-model"
-                  activeClassName="active"
+                  activeClassName={"active"}
                 >
-                  <Button>Logout</Button>
+                  <i class="fas fa-sign-out-alt" /> Logout
                 </NavLink>
 
-                <Button onClick={this.handleShow}>Profile</Button>
-                <Modal show={this.state.show} onHide={this.handleClose}>
-                  <Modal.Header closeButton>
-                    <Modal.Title>Profile</Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body>
-                    {" "}
-                    <div>{<TableRow1 obj={profile} key={profile._id} />}</div>
-                  </Modal.Body>
-                  <Modal.Footer>
-                    <Button variant="secondary" onClick={this.handleClose}>
-                      Close
-                    </Button>
-                  </Modal.Footer>
-                </Modal>
+                <Link onClick={this.handleShow} className="nav-item Box-model">
+                  <i class="fa fa-user" aria-hidden="true" />
+                  Profile
+                </Link>
+                <>
+                  <Modal
+                    show={this.state.show}
+                    onHide={this.handleClose}
+                    // className="animate"
+                  >
+                    <Modal.Header closeButton>
+                      <Modal.Title>Profile</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                      <div>
+                        <TableRow1
+                          obj={profile}
+                          key={profile._id}
+                          hide={this.state.disabled}
+                          isEnable={this.isEnable}
+                          disabled={this.state.disabled}
+                          enable={this.state.enable}
+                          Value={this.state.Value}
+                        />
+                      </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button variant="secondary" onClick={this.handleClose}>
+                        Close
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
+                </>
               </>
             ) : (
               <>
                 <NavLink
                   to={"/signup"}
                   className="nav-item Box-model"
-                  activeClassName="active"
+                  activeClassName={"active"}
                 >
-                  <Button>Sign Up</Button>
+                  <i class="fa fa-user-plus top" aria-hidden="true" />
+                  Sign Up
                 </NavLink>
                 <NavLink
                   to={"/login"}
                   className="nav-item Box-model"
-                  activeClassName="active"
+                  activeClassName={"active"}
                 >
-                  <Button>Log In</Button>
+                  <i class="fas fa-sign-in-alt top" />
+                  Log In
                 </NavLink>
               </>
             )}

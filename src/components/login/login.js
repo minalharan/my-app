@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Axios from "axios";
-import { withRouter , Link } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import Validator, { ValidationTypes } from "js-object-validation";
 import {
@@ -153,21 +153,24 @@ class Login extends Component {
                   <p className="text-danger">{passwordError}</p>
                 ) : null}
               </FormGroup>
-              <Link to ="/forgot-password"><p>Forgot password ?</p></Link>
               <Button variant="primary" type="submit">
                 <i class="fas fa-sign-in-alt top" />
                 {isLoading ? "Please wait..." : "Sign In"}
               </Button>
               &nbsp; &nbsp;
-              <Button
+              <br />
+              <br />
+              <Link to="/forgot-password">
+                <p>Forgot password ?</p>
+              </Link>
+              <Link
                 variant="info"
                 onClick={() => {
                   this.props.history.push("/signup");
                 }}
               >
-                <i class="fas fa-user-plus top" />
-                Sign Up
-              </Button>
+                Not registered yet ?
+              </Link>
             </form>
           </Container>
         </Row>

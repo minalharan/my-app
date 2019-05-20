@@ -14,7 +14,8 @@ class Update extends Component {
       productPrice: "",
       productSellingPrice: "",
       file: "",
-      imageUpdated: false
+      imageUpdated: false,
+      imagePreviewUrl: ""
     };
   }
 
@@ -109,83 +110,126 @@ class Update extends Component {
     });
   };
   onChangefile = e => {
-    console.log(e.target.files[0]);
-    console.log("e.target.files[0]");
+    let reader = new FileReader();
+    let file = e.target.files[0];
     this.setState({
       file: e.target.files[0] ? e.target.files[0] : null,
       imageUpdated: true
     });
+    reader.onloadend = () => {
+      this.setState({
+        file: file,
+        imagePreviewUrl: reader.result
+      });
+    };
+
+    reader.readAsDataURL(file);
   };
   render() {
+    let { imagePreviewUrl, file } = this.state;
+    let $imagePreview = (
+      <img src={BASE_URL + this.state.file} width="150px" height="150px" />
+    );
+    if (imagePreviewUrl) {
+      $imagePreview = (
+        <img src={imagePreviewUrl} width="150px" height="150px" />
+      );
+    }
     return (
-      <div style={{ marginTop: 10 }} align="center" className="animate">
+      <div style={{ marginTop: 10 }} align="left" className="animate">
+        <link
+          rel="stylesheet"
+          href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay"
+          crossorigin="anonymous"
+        />
         <h3 align="center">Update Product</h3>
         <form onSubmit={this.onSubmit} noValidate className="auth-box1">
           <FormGroup align="center">
-            <br />
-            <img
-              src={BASE_URL + this.state.file}
-              width="150px"
-              height="150px"
-            />
+            <div className="imgPreview">{$imagePreview}</div>
           </FormGroup>
-
           <FormGroup>
-            <FormLabel>Product Title</FormLabel>
+            <FormLabel>
+              <i class="fab fa-product-hunt top" />
+              Title
+            </FormLabel>
             <FormControl
               type="text"
               placeholder="product Title"
               name="productTitle"
               value={this.state.productTitle}
               onChange={this.onInputChange}
-              className="c"
+              className="bg auth-box c"
             />
           </FormGroup>
           <FormGroup>
-            <FormLabel> Product Details</FormLabel>
+            <FormLabel>
+              <i class="fas fa-info top" />
+              Details
+            </FormLabel>
             <FormControl
               type="text"
               placeholder="product Details"
               name="productDetail"
               value={this.state.productDetail}
               onChange={this.onInputChange}
-              className="c"
+              className="bg auth-box c"
             />
           </FormGroup>
           <FormGroup>
-            <FormLabel>Product Price</FormLabel>
+            <FormLabel>
+              <i class="fas fa-tag top" />
+              Price
+            </FormLabel>
             <FormControl
               type="text"
               placeholder="product Price"
               name="productPrice"
               value={this.state.productPrice}
               onChange={this.onInputChange}
+              className="bg auth-box c"
             />
           </FormGroup>
-
           <FormGroup>
-            <FormLabel> Product Selling Price</FormLabel>
+            <FormLabel>
+              <i class="fas fa-tag top" />
+              Selling Price
+            </FormLabel>
             <FormControl
               type="text"
               placeholder=" product Selling Price"
               name="productSellingPrice"
               value={this.state.productSellingPrice}
               onChange={this.onInputChange}
+              className="bg auth-box c"
             />
           </FormGroup>
-
           <FormGroup>
-            <FormLabel> product Image</FormLabel>
+            <FormLabel>
+              <i class="far fa-file-image top" />
+              Image
+            </FormLabel>
             <FormControl
               type="file"
               placeholder="product Image"
               name="file"
               onChange={this.onChangefile}
+              className="bg auth-box c"
             />
           </FormGroup>
           <br />
           <Button variant="dark" type="submit">
             Update Product
+          </Button>
+          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+          <Button
+            variant="dark"
+            onClick={() => {
+              this.props.history.push("/product-list");
+            }}
+          >
+            Cancel
           </Button>
           <br />
         </form>

@@ -5,9 +5,7 @@ import Home from "./components/Home/home";
 import "./App.css";
 import Login from "./components/login/login";
 import AddProduct from "./components/addProduct/addProduct";
-import { Navbar, Container, Nav, Button, Modal } from "react-bootstrap";
-import axios from "axios";
-import { NavLink } from "react-router-dom";
+import { Container } from "react-bootstrap";
 import "react-toastify/dist/ReactToastify.css";
 import ProductList from "./components/product list/productList";
 import Update from "./components/product list/update";
@@ -61,7 +59,7 @@ class App extends Component {
                 path="/forgot-password"
                 component={ForgotPassword}
               />
-              <DefaultLayout path="/reset/:token" component={ResetPassword} />
+              <DefaultLayout path="/reset/:token1" component={ResetPassword} />
               <DefaultLayout path="/navbar" component={Navbar1} />
               <DefaultLayout component={NoMatch} />
             </Switch>

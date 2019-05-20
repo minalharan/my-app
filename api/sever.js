@@ -242,11 +242,13 @@ app.post("/profile", async (req, res) => {
     const value = req.body.cId;
     const result = await User.findOne({ _id: value });
     res.status(200).json({
+      success: true,
       result,
       message: "Data get."
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
       message:
         error.message ||
         "An unexpected error occure while processing your request."
@@ -286,6 +288,36 @@ app.put(
   }
 );
 
+// app.put(
+//   "/changePassword",
+//   verifyToken,
+//   upload.single("file"),
+//   async (req, res) => {
+//     // First read existing users.
+//     try {
+//       const { body } = req;
+//       const value = req.body.cId;
+//       const Password = req.body.password;
+//       const salt = bcrypt.genSaltSync(5);
+//       const hash = bcrypt.hashSync(Password, salt);
+//       req.body.password = hash;
+//       const result = await User.findOneAndUpdate(
+//         { _id: value},
+//         { $set: { password: hash } }
+//       );
+//       res.status(200).json({
+//         result,
+//         message: "Password Updated"
+//       });
+//     } catch (error) {
+//       res.status(500).json({
+//         message:
+//           error.message ||
+//           "An unexpected error occure while processing your request."
+//       });
+//     }
+//   }
+// );
 app.post(
   "/login",
   [
@@ -556,20 +588,20 @@ app.post(
     check("email")
       .not()
       .isEmpty()
+      .withMessage("Email can't be empty")
       .trim()
       .normalizeEmail()
   ],
   async (req, res) => {
-    if (req.body.email === "") {
-      res.status(400).send("email required");
-    }
-    console.error(req.body.email);
     const user = await User.findOne({
       email: req.body.email
     });
     if (!user) {
       console.error("email not in database");
-      res.status(403).send("email not in db");
+      res.status(400).json({
+        message: "Email does not exist, Plesae enter right email ",
+        success: false
+      });
     } else {
       const token = crypto.randomBytes(20).toString("hex");
       const user = await User.findOneAndUpdate(
@@ -577,14 +609,14 @@ app.post(
         {
           $set: {
             resetPasswordToken: token,
-            resetPasswordExpires: Date.now() + 600000
+            resetPasswordExpires: Date.now() + 750000
           }
         }
       );
-      // res.status(200).json({
-      //   user,
-      //   message: "data get"
-      // });
+      res.status(200).json({
+        user,
+        message: "data get"
+      });
 
       const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -620,13 +652,13 @@ app.post(
 );
 
 // const Op = Sequelize.Op;
-app.get("/reset", async (req, res) => {
+app.get("/reset/:token1", async (req, res) => {
   console.log(req.query);
   console.log("Date.now()");
   console.log(Date.now());
 
   const user = await User.findOne({
-    resetPasswordToken: req.query.token,
+    resetPasswordToken: req.params.token1,
     resetPasswordExpires: {
       $gt: Date.now()
     }
@@ -645,50 +677,91 @@ app.get("/reset", async (req, res) => {
   }
 });
 
-app.put("/updatePasswordViaEmail", async (req, res) => {
-  const user = User.findOne({
-    email: req.body.email,
-    resetPasswordToken: req.body.token,
-    resetPasswordExpires: {
-      $gt: Date.now()
-    }
-  });
-  if (!user) {
-    console.error("password reset link is invalid or has expired");
-    res.status(403).send("password reset link is invalid or has expired");
-  } else if (user != null) {
-    console.log("user exists in db");
-    const password = req.body.password;
-    const hashedPassword = bcrypt.hash(password, 10);
+app.put(
+  "/updatePasswordViaEmail",
+  [
+    check("email")
+      .not()
+      .isEmpty()
+      .withMessage("Email cant be empty.")
+      .isEmail()
+      .withMessage("Enter the valid email."),
 
-    const user = await User.findOneAndUpdate(
-      {
-        email: req.body.email,
-        resetPasswordToken: req.body.token,
-        resetPasswordExpires: {
-          $gt: Date.now()
+    // .custom(async (email, { req, res }) => {
+    //   const userData = await User.findOne({ email })
+    //   if (userData) {
+    //     throw new Error("User already exists.");
+    //   }
+    // }).withMessage('User already existss '),
+    check("password")
+      .not()
+      .isEmpty()
+      .withMessage("Password cant be empty.")
+      .isLength({ min: 4 })
+      .withMessage("Must be at least 4 chars long.")
+      //.isLength({ max: 13 }).withMessage('Max length of password is 13.')
+      .custom((value, { req }) => {
+        if (value !== req.body.confirmPassword) {
+          throw new Error("Password confirmation is incorrect.");
         }
-      },
-      {
-        $set: {
-          password: hashedPassword,
-          resetPasswordToken: null,
-          resetPasswordExpires: null
-        }
+        return true;
+      })
+      .withMessage("Password did't match.")
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({
+        errors: errors.array()
+      });
+    }
+    const user = User.findOne({
+      email: req.body.email,
+      resetPasswordToken: req.body.resetPasswordToken,
+      resetPasswordExpires: {
+        $gt: Date.now()
       }
-    );
-    console.log("password");
-    console.log(hashedPassword);
+    });
+    console.log("req.body.token");
+    console.log(req.body.resetPasswordToken);
+    if (!user) {
+      console.error("password reset link is invalid or has expired");
+      res.status(403).send("password reset link is invalid or has expired");
+    } else if (user != null) {
+      console.log("user exists in db");
+      const Password = req.body.password;
+      const salt = bcrypt.genSaltSync(5);
+      const hash = bcrypt.hashSync(Password, salt);
+      req.body.password = hash;
+      const user = await User.findOneAndUpdate(
+        {
+          email: req.body.email,
+          resetPasswordToken: req.body.resetPasswordToken,
+          resetPasswordExpires: {
+            $gt: Date.now()
+          }
+        },
+        {
+          $set: {
+            resetPasswordToken: null,
+            resetPasswordExpires: null,
+            password: hash
+          }
+        }
+      );
+      // console.log("password");
+      // console.log(hashedPassword);
 
-    if (user) {
-      console.log("password updated");
-      res.status(200).send({ message: "password updated" });
+      if (user) {
+        console.log("password updated");
+        res.status(200).send({ message: "password updated" });
+      }
+    } else {
+      console.error("no user exists in db to update");
+      res.status(401).json("no user exists in db to update");
     }
-  } else {
-    console.error("no user exists in db to update");
-    res.status(401).json("no user exists in db to update");
   }
-});
+);
 
 var server = app.listen(8000, function() {
   var host = server.address().address;
